@@ -42,12 +42,10 @@ model.compile(optimizer='adam',
               metrics=[tf.metrics.BinaryAccuracy(threshold=0.0, name='accuracy')])
 
 x_val = train_examples[:10000]
-x_train = train_examples[10000:20000]
-x_test = train_examples[20000:]
+x_train = train_examples[10000:]
 
 y_val = train_labels[:10000]
-y_train = train_labels[10000:20000]
-y_test = train_labels[20000:]
+y_train = train_labels[10000:]
 
 history = model.fit(x_train,
                     y_train,
@@ -56,7 +54,35 @@ history = model.fit(x_train,
                     validation_data=(x_val, y_val),
                     verbose=1)
 
-results = model.evaluate(x_test, y_test)
-
+results = model.evaluate(test_data, test_labels)
 print(f"results: {results}")
 
+history_dict = history.history
+print(f"history_dict.keys(): {history_dict.keys()}")
+
+acc = history_dict['accuracy']
+val_acc = history_dict['val_accuracy']
+loss = history_dict['loss']
+val_loss = history_dict['val_loss']
+
+epochs = range(1, len(acc) + 1)
+
+# "bo" is for "blue dot"
+plt.plot(epochs, loss, 'bo', label='Training loss')
+# b is for "solid blue line"
+plt.plot(epochs, val_loss, 'b', label='Validation loss')
+plt.title('Training and validation loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+plt.show()
+
+plt.clf()   # clear figure
+plt.plot(epochs, acc, 'bo', label='Training acc')
+plt.plot(epochs, val_acc, 'b', label='Validation acc')
+plt.title('Training and validation accuracy')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.legend()
+
+plt.show()

@@ -1,5 +1,6 @@
 import os
 import sys
+from es_odio_tensor_flow import es_odio_TF
 import numpy as npd
 import pandas as p
 import sklearn as sk
@@ -38,6 +39,10 @@ else:
     path, csvs = sys.argv[1], sys.argv[2:]
     if chequear_archivos_impartidos(path):
         if chequear_csvs(path, csvs):
+            #Aca deberiamos entrenar el modelo una sola ves.
+            es_odio_TF()
             print(f"Path {path}")
             for csv in csvs:
                 print(f"\tcsv: {csv}")
+                # Aca deberiamos convertir los csv en numpys?
+                # Aca deberiamos usar el model para predecir cada csv
