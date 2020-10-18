@@ -63,8 +63,12 @@ def prueba_2():
 	encoded_twits = t.texts_to_sequences(twits)
 	print(f"\nencoded_twits:\n{encoded_twits}")
 	# pad documents to a max length of 4 words
+	# Calculo largo maximo
+	mylen = np.vectorize(len)
+	lens=mylen(encoded_twits)
+	max_len=max(lens)
 	#TODO: Contar el twtit mas largo
-	max_length = 140
+	max_length = max_len
 	padded_twits = pad_sequences(encoded_twits, maxlen=max_length, padding='post')
 	print(f"\npadded_twits:\n{padded_twits}")
 
