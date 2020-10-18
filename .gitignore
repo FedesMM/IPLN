@@ -6,3 +6,4 @@ lib64
 pyvenv.cfg
 introPLN2020_lab.pdf
 intropln_2020_clase_lab.pdf
+__pycache__/

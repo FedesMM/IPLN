@@ -6,7 +6,6 @@ import pandas as p
 import sklearn as sk
 import keras as k
 
-
 def chequear_archivos_impartidos(path):
     # Chequeo de los archivos impartidos (train.csv, val.csv, test.csv fasttext.es.300.txt) en la ruta
 
