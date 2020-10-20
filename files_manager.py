@@ -15,6 +15,11 @@ def load_test():
     #print(data[:5])
     return data[:, :]
 
+def load_file(filename):
+    data = pd.read_csv(filename, header=None, sep='\t')
+    data = np.array(data)
+    return data[:, :]
+
 
 def preprocesing(lines):
 

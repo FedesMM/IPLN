@@ -3,7 +3,7 @@ from keras_preprocessing.sequence import pad_sequences
 from keras_preprocessing.text import one_hot, Tokenizer
 from tensorflow.python.keras import Sequential
 from tensorflow.python.keras.layers import Embedding, Flatten, Dense
-from files_manager import load_fasttext_es_300, load_test, preprocesing
+from files_manager import load_fasttext_es_300, load_test, load_file, preprocesing
 import numpy as np
 
 def prueba_1():
@@ -46,35 +46,45 @@ def prueba_1():
 	loss, accuracy = model.evaluate(padded_docs, labels, verbose=0)
 	print('Accuracy: %f' % (accuracy*100))
 
-def prueba_2():
-	cantidad_twits=10
-	# define class twits
-	test = load_test()
-	twits = preprocesing(test[:cantidad_twits, 0])
-	print(f"\ntwiters:\n{twits}")
+def prepare_tweets(tweets, tokenizer, max_length):
+	twits = preprocesing(tweets[:len(tweets), 0])
+	#print(f"\ntwiters:\n{twits}")
 	# define class labels
-	labels = test[:cantidad_twits, 1].astype('float32')
-	print(f"\nlabels:\n{labels}")
+	y = tweets[:len(tweets), 1].astype('float32')
+	#print(f"\nlabels:\n{y}")
+	
+	# integer encode the documents
+	encoded_twits = tokenizer.texts_to_sequences(twits)
+	# print(f"\nencoded_twits:\n{encoded_twits}")	
+	x = pad_sequences(encoded_twits, maxlen=max_length, padding='post')
+	return (x,y)
+
+def prueba_2():
+	# define class twits
+	test = load_file('test.csv')
+	train = load_file('train.csv')
+	val = load_file('val.csv')
+
+	twits = preprocesing(test[:len(test), 0])
 	# prepare tokenizer
 	t = Tokenizer()
 	t.fit_on_texts(twits)
 	vocab_size = len(t.word_index) + 1
-	# integer encode the documents
-	encoded_twits = t.texts_to_sequences(twits)
-	print(f"\nencoded_twits:\n{encoded_twits}")
-	# pad documents to a max length of 4 words
+
 	# Calculo largo maximo
 	mylen = np.vectorize(len)
-	lens=mylen(encoded_twits)
+	lens=mylen(twits)
 	max_len=max(lens)
 	#TODO: Contar el twtit mas largo
 	max_length = max_len
-	padded_twits = pad_sequences(encoded_twits, maxlen=max_length, padding='post')
-	print(f"\npadded_twits:\n{padded_twits}")
+
+	test_data = prepare_tweets(test, t, max_length)
+	train_data = prepare_tweets(train, t, max_length)
+	val_data = prepare_tweets(val, t, max_length)
 
 	# load the whole embedding into memory
 	embeddings_index = dict()
-	f = open('fasttext.es.300.txt')
+	f = open('fasttext.es.300.txt', encoding="utf8")
 	for line in f:
 		values = line.split()
 		word = values[0]
@@ -101,9 +111,9 @@ def prueba_2():
 	# summarize the model
 	print(model.summary())
 	# fit the model
-	model.fit(padded_twits, labels, epochs=50, verbose=0)
+	model.fit(train_data[0], train_data[1], epochs=50, verbose=0, validation_data=val_data, validation_batch_size=32)
 	# evaluate the model
-	loss, accuracy = model.evaluate(padded_twits, labels, verbose=0)
+	loss, accuracy = model.evaluate(x=test_data[0], y=test_data[1], verbose=0)
 	print('Accuracy: %f' % (accuracy * 100))
 
 prueba_2()
