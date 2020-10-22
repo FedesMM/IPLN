@@ -23,17 +23,34 @@ def load_file(filename):
 
 def preprocesing(lines):
 
-    #Usuarios
-    #URL
 
-    #print(lines)
+    print(lines)
+
+    #Usuarios
+    lines = np.array([re.sub(
+        r'''(?<=^|(?<=[^a-zA-Z0-9-_\.]))@([A-Za-z]+[A-Za-z0-9-_]+)''',
+        '@USUARIOS', line, flags=re.MULTILINE)
+        for line in lines])
+    #URL
     lines = np.array([re.sub(
         r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''',
-        '@URL', line, flags=re.MULTILINE)
+        '', line, flags=re.MULTILINE)
                       for line in lines])
-    #print(lines)
 
+    # Hashtags
+    lines = np.array([re.sub(
+        r'''\#''',
+        '', line, flags=re.MULTILINE)
+                      for line in lines])
     #Multiletra
+    lines = np.array([re.sub(
+        r'''(\w)\1{2,}''',
+        r'''\1''', line, flags=re.MULTILINE)
+        for line in lines])
+    print(lines)
     #Numeros
+
+    #Lower se maneja desde el tokenize
+    #lines = np.char.lower(lines)
 
     return lines

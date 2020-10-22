@@ -50,7 +50,7 @@ def prepare_tweets(tweets, tokenizer, max_length):
 	twits = preprocesing(tweets[:len(tweets), 0])
 	#print(f"\ntwiters:\n{twits}")
 	# define class labels
-	y = tweets[:len(tweets), 1].astype('float32')
+	y = tweets[:, 1].astype('float32')
 	#print(f"\nlabels:\n{y}")
 	
 	# integer encode the documents
@@ -61,11 +61,10 @@ def prepare_tweets(tweets, tokenizer, max_length):
 
 def prueba_2():
 	# define class twits
-	test = load_file('test.csv')
 	train = load_file('train.csv')
 	val = load_file('val.csv')
-
-	twits = preprocesing(test[:len(test), 0])
+	test = load_file('test.csv')
+	twits = preprocesing(train[:, 0])
 	# prepare tokenizer
 	t = Tokenizer()
 	t.fit_on_texts(twits)
@@ -77,10 +76,9 @@ def prueba_2():
 	max_len=max(lens)
 	#TODO: Contar el twtit mas largo
 	max_length = max_len
-
-	test_data = prepare_tweets(test, t, max_length)
 	train_data = prepare_tweets(train, t, max_length)
 	val_data = prepare_tweets(val, t, max_length)
+	test_data = prepare_tweets(test, t, max_length)
 
 	# load the whole embedding into memory
 	embeddings_index = dict()
@@ -111,7 +109,7 @@ def prueba_2():
 	# summarize the model
 	print(model.summary())
 	# fit the model
-	model.fit(train_data[0], train_data[1], epochs=50, verbose=0, validation_data=val_data, validation_batch_size=32)
+	model.fit(train_data[0], train_data[1], epochs=50, verbose=1, validation_data=val_data, validation_batch_size=32)
 	# evaluate the model
 	loss, accuracy = model.evaluate(x=test_data[0], y=test_data[1], verbose=0)
 	print('Accuracy: %f' % (accuracy * 100))
