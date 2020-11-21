@@ -4,6 +4,7 @@ from tensorflow.python.keras import Sequential
 from tensorflow.python.keras.layers import Embedding, Flatten, Dense
 from files_manager import load_fasttext_es_300, load_test, load_file, preprocesing
 import numpy as np
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 
 def prepare_tweets(tweets, tokenizer, max_length):
@@ -26,6 +27,9 @@ def train(data_path):
 	t = Tokenizer()
 	t.fit_on_texts(twits)
 	vocab_size = len(t.word_index) + 1
+
+	twits = [x.split() for x in twits]
+	#print(twits)
 
 	# Calculo largo maximo
 	mylen = np.vectorize(len)
@@ -58,14 +62,20 @@ def train(data_path):
 	model = Sequential()
 	e = Embedding(vocab_size, 300, weights=[embedding_matrix], input_length=max_length, trainable=False)
 	model.add(e)
+	#model.add(Dense(300, activation='sigmoid'))
 	model.add(Flatten())
 	model.add(Dense(1, activation='sigmoid'))
 	# compile the model
 	model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 	# summarize the model
 	print(model.summary())
+
+	# Set callback functions to early stop training and save the best model so far
+	callbacks = [EarlyStopping(monitor='val_loss', patience=10),
+		ModelCheckpoint(filepath='best_model.h5', monitor='val_loss', save_best_only=True)]
+
 	# fit the model
-	model.fit(train_data[0], train_data[1], epochs=50, verbose=1, validation_data=val_data, validation_batch_size=32)
+	model.fit(train_data[0], train_data[1], epochs=100, verbose=1, callbacks=callbacks, validation_data=val_data, validation_batch_size=32)
 	return model, t, max_length
 
 
