@@ -23,9 +23,6 @@ def load_file(filename):
 
 def preprocesing(lines):
 
-
-    print(lines)
-
     #Usuarios
     lines = np.array([re.sub(
         r'''(?<=^|(?<=[^a-zA-Z0-9-_\.]))@([A-Za-z]+[A-Za-z0-9-_]+)''',
@@ -47,10 +44,19 @@ def preprocesing(lines):
         r'''(\w)\1{2,}''',
         r'''\1''', line, flags=re.MULTILINE)
         for line in lines])
-    print(lines)
+
     #Numeros
 
     #Lower se maneja desde el tokenize
     #lines = np.char.lower(lines)
 
     return lines
+
+def save_file(name, predicted): 
+    outname = name.split('.')[0]
+    f = open(outname + ".out", "w")
+
+    for prediction in predicted:
+        p = "1" if prediction > 0.5 else "0"
+        f.write(p + "\n")
+    f.close()

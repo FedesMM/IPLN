@@ -5,6 +5,8 @@ import numpy as npd
 import pandas as p
 import sklearn as sk
 import keras as k
+import train
+import evaluate
 
 def chequear_archivos_impartidos(path):
     # Chequeo de los archivos impartidos (train.csv, val.csv, test.csv fasttext.es.300.txt) en la ruta
@@ -39,9 +41,12 @@ else:
     if chequear_archivos_impartidos(path):
         if chequear_csvs(path, csvs):
             #Aca deberiamos entrenar el modelo una sola ves.
-            es_odio_TF()
+            model, t, max_length = train.train(path)
             print(f"Path {path}")
             for csv in csvs:
                 print(f"\tcsv: {csv}")
+                
+                evaluate.evaluate(model, t, max_length, path, csv)
+
                 # Aca deberiamos convertir los csv en numpys?
                 # Aca deberiamos usar el model para predecir cada csv
