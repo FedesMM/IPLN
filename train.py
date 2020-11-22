@@ -1,3 +1,4 @@
+from os import name
 from keras_preprocessing.sequence import pad_sequences
 from keras_preprocessing.text import one_hot, Tokenizer
 from tensorflow.python.keras import Sequential
@@ -10,11 +11,12 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 def prepare_tweets(tweets, tokenizer, max_length):
 	twits = preprocesing(tweets[:len(tweets), 0])
 	# define class labels
+	
 	y = tweets[:, 1].astype('float32')
 	
 	# integer encode the documents
 	encoded_twits = tokenizer.texts_to_sequences(twits)
-	x = pad_sequences(encoded_twits, maxlen=max_length, padding='post')
+	x = pad_sequences(encoded_twits, maxlen=max_length, padding='post').astype('float32')
 	return (x,y)
 
 def train(data_path):
@@ -37,8 +39,18 @@ def train(data_path):
 	max_len=max(lens)
 	#TODO: Contar el twtit mas largo
 	max_length = max_len
-	train_data = prepare_tweets(train, t, max_length)
-	val_data = prepare_tweets(val, t, max_length)
+	train_data_x, train_data_y = prepare_tweets(train, t, max_length)
+	val_data_x, val_data_y  = prepare_tweets(val, t, max_length)
+	print("x: "+str(train_data_x.shape)+", y: "+str(train_data_y.shape))
+	print("x: "+str(val_data_x.shape)+", y: "+str(val_data_y.shape))
+
+	#calculo features
+	max_length=max_length+1
+	
+	new_train_data_x = np.concatenate ((train_data_x , (np.asmatrix(train_data_y)).T), axis=1)
+	new_val_data_x = np.concatenate ((val_data_x , (np.asmatrix(val_data_y)).T), axis=1)	
+	print(new_train_data_x.shape)
+	print(new_val_data_x.shape)
 
 	# load the whole embedding into memory
 	embeddings_index = dict()
@@ -64,18 +76,21 @@ def train(data_path):
 	model.add(e)
 	#model.add(Dense(300, activation='sigmoid'))
 	model.add(Flatten())
-	model.add(Dense(1, activation='sigmoid'))
+	model.add(Dense(1, activation='sigmoid', name="Sigmoide"))
+	#model.add(Dense(1, activation='relu', name="Relu_1"))
+	#model.add(Dense(1, activation='relu', name="Relu_2"))
+	#model.add(Dense(100, activation='elu', name="Elu"))
+	#model.add(Dense(1, activation='elu', name="densa_3"))
 	# compile the model
 	model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 	# summarize the model
 	print(model.summary())
 
 	# Set callback functions to early stop training and save the best model so far
-	callbacks = [EarlyStopping(monitor='val_loss', patience=10),
-		ModelCheckpoint(filepath='best_model.h5', monitor='val_loss', save_best_only=True)]
-
+	callbacks = [EarlyStopping(monitor='val_accuracy', patience=5),
+		ModelCheckpoint(filepath='best_model.h5', monitor='val_accuracy', save_best_only=True)]
 	# fit the model
-	model.fit(train_data[0], train_data[1], epochs=100, verbose=1, callbacks=callbacks, validation_data=val_data, validation_batch_size=32)
+	model.fit(new_train_data_x, train_data_y, epochs=100, verbose=1, callbacks=callbacks, validation_data=(new_val_data_x,val_data_y), validation_batch_size=32)
 	return model, t, max_length
 
 

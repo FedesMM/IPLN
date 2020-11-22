@@ -22,7 +22,7 @@ def load_file(filename):
 
 
 def preprocesing(lines):
-
+    # return lines
     #Usuarios
     lines = np.array([re.sub(
         r'''(?<=^|(?<=[^a-zA-Z0-9-_\.]))@([A-Za-z]+[A-Za-z0-9-_]+)''',
