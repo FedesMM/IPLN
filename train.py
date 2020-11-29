@@ -10,7 +10,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 '''Recibe una lista de twits y devuelve un arreglo enteros que cuenta cuantas palabras en plurar hay en cada twit de la lista de entrada.'''
 def contar_plurales(twits):
-	print ("twits.size: "+str(twits.size))
+	#print ("twits.size: "+str(twits.size))
 	conteo_plurales=[]
 	for twit in twits:	
 		plurales= re.compile(r'[o|a]s(?![a-zA-Z0-9])')
@@ -22,7 +22,7 @@ def prepare_tweets(tweets, tokenizer, max_length):
 	# Features antes del preprocesing
 	#Feature 1
 	plurales=contar_plurales(tweets)
-	print ("plurales1: "+str(plurales))
+	#print ("plurales1: "+str(plurales))
 
 	twits = preprocesing(tweets[:len(tweets), 0])
 	# define class labels
@@ -58,8 +58,8 @@ def train(data_path):
 	val_data_x, val_data_y  = prepare_tweets(val, t, max_length)
 	#Se agrego la feature plurales 
 	max_length+=1
-	print("x: "+str(train_data_x.shape)+", y: "+str(train_data_y.shape))
-	print("x: "+str(val_data_x.shape)+", y: "+str(val_data_y.shape))
+	#print("x: "+str(train_data_x.shape)+", y: "+str(train_data_y.shape))
+	#print("x: "+str(val_data_x.shape)+", y: "+str(val_data_y.shape))
 
 	#calculo features
 	#max_length=max_length+1
@@ -78,7 +78,7 @@ def train(data_path):
 		coefs = np.asarray(values[1:], dtype='float32')
 		embeddings_index[word] = coefs
 	f.close()
-	print('Loaded %s word vectors.' % len(embeddings_index))
+	#print('Loaded %s word vectors.' % len(embeddings_index))
 
 	# create a weight matrix for words in training docs
 	embedding_matrix = np.zeros((vocab_size, 300))
@@ -107,10 +107,10 @@ def train(data_path):
 	callbacks = [EarlyStopping(monitor='val_accuracy', patience=50),
 		ModelCheckpoint(filepath='best_model.h5', monitor='val_accuracy', save_best_only=True)]
 	
-	print(train_data_x.shape)
-	print(train_data_y.shape)
-	print(val_data_x.shape)
-	print(val_data_y.shape)
+	#print(train_data_x.shape)
+	#print(train_data_y.shape)
+	#print(val_data_x.shape)
+	#print(val_data_y.shape)
 	# fit the model
 	model.fit(train_data_x, train_data_y, epochs=100, verbose=1, callbacks=callbacks, validation_data=(val_data_x,val_data_y), validation_batch_size=32)
 	return model, t, max_length

@@ -1,10 +1,6 @@
 import os
 import sys
 from es_odio_tensor_flow import es_odio_TF
-import numpy as npd
-import pandas as p
-import sklearn as sk
-import keras as k
 import train
 import evaluate
 

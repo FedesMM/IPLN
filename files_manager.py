@@ -52,9 +52,9 @@ def preprocesing(lines):
 
     return lines
 
-def save_file(name, predicted): 
+def save_file(path, name, predicted): 
     outname = name.split('.')[0]
-    f = open(outname + ".out", "w")
+    f = open(path + outname + ".out", "w")
 
     for prediction in predicted:
         p = "1" if prediction > 0.5 else "0"
